@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-import datetime
+from datetime import datetime
 import pytz
 
 # TODO Refactor so Bot is a class???
@@ -14,7 +14,7 @@ load_dotenv()
 
 
 # secret token to access bot (Never share this)
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN: str = os.getenv('DISCORD_TOKEN')
 
 # select intents the bot needs in order to work (not sure about which ones are really needed)
 intents = discord.Intents.default()
@@ -24,7 +24,7 @@ intents.message_content = True
 intents.guilds = True
 
 # If channel ID is from a Server without the bot, bot.get_channel apparently returns None
-dm_channel_id = -99
+dm_channel_id: int = -99
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -43,8 +43,9 @@ async def on_message(message):
     if isinstance(message.channel, discord.DMChannel) and message.author != bot.user:
         # TODO: implement logger
         # Get current datetime and format it
-        now = datetime.datetime.now(pytz.timezone('Europe/Berlin'))
-        formatted_time = now.strftime("%d.%m.%Y %H:%M")
+        now: datetime = datetime.now(pytz.timezone('Europe/Berlin'))
+        formatted_time: str = now.strftime("%d.%m.%Y %H:%M")
+        timestamp: float = now.timestamp()
         print(f'{message.author.name} sent message {message.content} at {formatted_time}')
         # Reply to user if there is no dm_channel set
         if dm_channel_id == -99:
@@ -66,8 +67,8 @@ async def set_dm_channel(ctx, channel_name=''):
     if channel_name == '':
         await ctx.send('Command Syntax: !dm-channel <channel_name>')
         return
-    guild = ctx.guild
-    channel = discord.utils.get(guild.text_channels, name=channel_name)
+    guild: discord.Guild = ctx.guild
+    channel: discord.TextChannel = discord.utils.get(guild.text_channels, name=channel_name)
     # Send error hint if channel does not exist
     if channel is None:
         await ctx.send(f'Found no channel \"{channel_name}\"')
@@ -76,12 +77,6 @@ async def set_dm_channel(ctx, channel_name=''):
     global dm_channel_id
     dm_channel_id = channel.id
     await ctx.send(f'Set channel where DMs will be redirected to to {dm_channel_id}')
-
-
-# Test command
-@bot.command(name='greet')
-async def greet(ctx):
-    await ctx.send(f"Hello {ctx.author.mention}")
 
 
 bot.run(TOKEN)
