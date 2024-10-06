@@ -1,6 +1,7 @@
 import os
 
 import discord
+from logger import Logger
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -77,6 +78,5 @@ async def set_dm_channel(ctx, channel_name=''):
     global dm_channel_id
     dm_channel_id = channel.id
     await ctx.send(f'Set channel where DMs will be redirected to to {dm_channel_id}')
-
 
 bot.run(TOKEN)

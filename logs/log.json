@@ -1,0 +1,50 @@
+{
+    "dm_count": {
+        "realfirehawk": 1,
+        "g\u00fcnni": 5
+    },
+    "messages": [
+        {
+            "author": "realfirehawk",
+            "content": "hi",
+            "timestamp_in_seconds": "0",
+            "formatted_time": "06.10.2024 01:10"
+        },
+        {
+            "author": "schlamasl",
+            "content": "leeeel",
+            "timestamp_in_seconds": "20",
+            "formatted_time": "06.10.2024 01:19"
+        },
+        {
+            "author": "g\u00fcnni",
+            "content": "hi",
+            "timestamp_in_seconds": 1,
+            "formatted_time": "-"
+        },
+        {
+            "author": "g\u00fcnni",
+            "content": "hi",
+            "timestamp_in_seconds": 1,
+            "formatted_time": "-"
+        },
+        {
+            "author": "g\u00fcnni",
+            "content": "hi",
+            "timestamp_in_seconds": 1,
+            "formatted_time": "-"
+        },
+        {
+            "author": "g\u00fcnni",
+            "content": "hi",
+            "timestamp_in_seconds": 1,
+            "formatted_time": "-"
+        },
+        {
+            "author": "g\u00fcnni",
+            "content": "hi",
+            "timestamp_in_seconds": 1,
+            "formatted_time": "-"
+        }
+    ]
+}
