@@ -7,7 +7,7 @@ from logger import Logger
 
 
 class OOPBot:
-    def __init__(self):
+    def __init__(self, logging=False):
         # dotenv loading
         load_dotenv()
         self.DISCORD_TOKEN: str = os.getenv('DISCORD_TOKEN')
@@ -17,7 +17,7 @@ class OOPBot:
         intents.message_content = True
         self.bot = commands.Bot(command_prefix='!', intents=intents)
         self.logger: Logger = Logger('log.json')
-        self.logging_active: bool = False
+        self.logging_active: bool = logging
 
         # TODO: Make a config file where stuff like this can be stored
         self.dm_channel_id: int = -99
@@ -76,7 +76,7 @@ class OOPBot:
         async def log(ctx: commands.Context, state='') -> None:
             if state == '':
                 await ctx.send('Missing Parameter; Usage: !log <on|off>')
-                return 
+                return
             if state == 'on':
                 self.logging_active = True
             elif state == 'off':
@@ -88,12 +88,41 @@ class OOPBot:
             await ctx.send(f'Logging: {self.logging_active}')
 
         @self.bot.command(name='log-file', help='Changes the file the logger writes to\n'
-                                                'Usage: !log-file <filename> <True|False|None>')
+                                                'Usage: !log-file <filename.json> <True|False|None>')
         @commands.has_permissions(administrator=True)
-        async def log_file(ctx: commands.Context, filename='', create_new=False) -> None:
+        # TODO: Make create_new param here
+        async def log_file(ctx: commands.Context, filename='') -> None:
             if filename == '':
-                await ctx.send('Please enter a filename; !log-file <filename>')
+                await ctx.send('Please enter a filename; !log-file <filename.json> <True|False|None>')
+                return
+            # Hideous solution so bot can send text message with success/failure response
+            file_set = self.logger.set_log_file(filename, False)
+            if file_set:
+                await ctx.send('Log file has been changed successfully')
+            else:
+                await ctx.send('The specified file seems to not exist. Make sure you spelled the filename correctly'
+                               'and ended with .json')
 
+        @self.bot.command(name='log-create', help='Creates a file for logging\n'
+                                                  'Usage: !log-create <filename.json>')
+        @commands.has_permissions(administrator=True)
+        async def log_create(ctx: commands.Context, filename: str = '') -> None:
+            if filename == '':
+                await ctx.send('Please enter a filename; !log-create <filename.json>')
+                return
+            elif not filename.endswith('.json'):
+                await ctx.send('Filename must end with .json')
+                return
+            else:
+                self.logger.__create_file__(filename)
+                await ctx.send(
+                    'Log file has been created successfully, use !log-file to change the file that is being logged to')
+
+        @self.bot.command(name='log-out', help='Sends the current log file to the channel')
+        @commands.has_permissions(administrator=True)
+        async def log_out(ctx: commands.Context, filename: str = '') -> None:
+            await ctx.send(
+                file=discord.File(self.logger.get_log_path(), 'logfile.json' if filename == '' else filename))
 
     def run(self):
         self.bot.run(self.DISCORD_TOKEN)
