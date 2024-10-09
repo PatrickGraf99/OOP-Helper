@@ -3,11 +3,13 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+
+from config import Config, ConfigException
 from logger import Logger
 
 
 class OOPBot:
-    def __init__(self, logging=False):
+    def __init__(self):
         # dotenv loading
         load_dotenv()
         self.DISCORD_TOKEN: str = os.getenv('DISCORD_TOKEN')
@@ -17,10 +19,20 @@ class OOPBot:
         intents.message_content = True
         self.bot = commands.Bot(command_prefix='!', intents=intents)
         self.logger: Logger = Logger('log.json')
-        self.logging_active: bool = logging
 
-        # TODO: Make a config file where stuff like this can be stored
-        self.dm_channel_id: int = -99
+        try:
+            self.logging_active = Config.load('logging_active')
+        except ConfigException as config_exception:
+            print(config_exception)
+            print('Could not load log state, used default of off')
+            self.logging_active = False
+
+        try:
+            self.dm_channel_id = Config.load('dm_channel_id')
+        except ConfigException as config_exception:
+            print(config_exception)
+            print('Could not load dm_channel_id, used default of -99')
+            self.dm_channel_id = -99
 
         self.__register_events__()
         self.__register_commands__()
@@ -68,6 +80,7 @@ class OOPBot:
                 await ctx.send(f'Sorry, I couldn\'t find the channel \"{channel_name}\"')
                 return
             self.dm_channel_id = channel.id
+            Config.save('dm_channel_id', self.dm_channel_id)
             await ctx.send(f'All DMs the bot receives will be redirected to {channel.mention} (ID: {channel.id})')
 
         @self.bot.command(name='log', help='Turns logging on or off\n'
@@ -79,8 +92,10 @@ class OOPBot:
                 return
             if state == 'on':
                 self.logging_active = True
+                Config.save('logging_active', self.logging_active)
             elif state == 'off':
                 self.logging_active = False
+                Config.save('logging_active', self.logging_active)
             else:
                 await ctx.send('Invalid parameter; Usage: !log <on|off>')
                 return
@@ -123,6 +138,12 @@ class OOPBot:
         async def log_out(ctx: commands.Context, filename: str = '') -> None:
             await ctx.send(
                 file=discord.File(self.logger.get_log_path(), 'logfile.json' if filename == '' else filename))
+
+        @self.bot.command(name='reset-config', help='Reset the config file to empty values')
+        @commands.has_permissions(administrator=True)
+        async def reset_config(ctx: commands.Context) -> None:
+            Config.reset()
+            await ctx.send('Config has been reset')
 
     def run(self):
         self.bot.run(self.DISCORD_TOKEN)
