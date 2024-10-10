@@ -66,23 +66,28 @@ class OOPBot:
 
     def __register_commands__(self) -> None:
 
-        @self.bot.command(name='dm-channel', help='Sets the channel where bot Dms will be redirected to\n'
-                                                  'Usage: !dm-channel <channel>')
+        @self.bot.command(name='dm-channel', help='Sets the channel where bot DMs will be redirected to\n'
+                                                  'Usage: !dm-channel <channel_id>')
         @commands.has_permissions(administrator=True)
-        async def dm_channel(ctx: commands.Context, channel_name='') -> None:
-            if channel_name == '':
-                await ctx.send('Please enter a channel name; !dm-channel <channel_name>')
+        async def dm_channel(ctx: commands.Context, channel_id=-99) -> None:
+            if type(channel_id) is not int:
+                await ctx.send('Please enter a valid channel id; !dm-channel <channel_id>')
+                return
+            if channel_id == -99:
+                await ctx.send('Please enter a valid channel id; !dm-channel <channel_id>')
                 return
             guild: discord.Guild = ctx.guild
             # TODO Use category in combination with channel name to uniquely identify the channel
-            channel: discord.TextChannel = discord.utils.get(guild.text_channels, name=channel_name)
+            channel: discord.TextChannel = discord.utils.get(guild.text_channels, id=channel_id)
             if channel is None:
-                await ctx.send(f'Sorry, I couldn\'t find the channel \"{channel_name}\"')
+                await ctx.send(f'Sorry, I couldn\'t find the channel with id \"{channel_id}\"')
                 return
             self.dm_channel_id = channel.id
             Config.save('dm_channel_id', self.dm_channel_id)
             await ctx.send(f'All DMs the bot receives will be redirected to {channel.mention} (ID: {channel.id})')
 
+
+        """
         @self.bot.command(name='log', help='Turns logging on or off\n'
                                            'Usage: !log <on|off>')
         @commands.has_permissions(administrator=True)
@@ -138,6 +143,7 @@ class OOPBot:
         async def log_out(ctx: commands.Context, filename: str = '') -> None:
             await ctx.send(
                 file=discord.File(self.logger.get_log_path(), 'logfile.json' if filename == '' else filename))
+        """
 
         @self.bot.command(name='reset-config', help='Reset the config file to empty values')
         @commands.has_permissions(administrator=True)
