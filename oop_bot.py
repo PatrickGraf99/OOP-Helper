@@ -87,7 +87,7 @@ class OOPBot:
             await ctx.send(f'All DMs the bot receives will be redirected to {channel.mention} (ID: {channel.id})')
 
 
-        """
+        """Uncomment these to activate log functionality
         @self.bot.command(name='log', help='Turns logging on or off\n'
                                            'Usage: !log <on|off>')
         @commands.has_permissions(administrator=True)
