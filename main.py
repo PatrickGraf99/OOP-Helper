@@ -41,7 +41,7 @@ class OOPBot:
                 # await message.channel.send('Sorry, there is currently no redirect channel. Please try again later')
             else:
                 target_channel = self.bot.get_channel(self.dm_channel_id)
-                await target_channel.send(f'Forwarded Message:\n {message.content}')
+                await target_channel.send(f'Forwarded Message:\n{message.content}')
             await self.bot.process_commands(message)
 
     def __register_commands__(self) -> None:
