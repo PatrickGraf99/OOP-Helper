@@ -2,14 +2,13 @@ import os
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+
 
 
 class OOPBot:
     def __init__(self):
-        # dotenv loading
-        load_dotenv()
-        self.DISCORD_TOKEN: str = os.getenv('DISCORD_TOKEN')
+
+        self.DISCORD_TOKEN: str = 'Place token here'
 
         intents = discord.Intents.default()
         intents.message_content = True
